@@ -1,48 +1,79 @@
 import { Command } from "commander";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
 import { sendTelegramMessage } from "sendkit-core";
+import { z } from "zod";
 
 const program = new Command();
+const configPath = join(homedir(), ".config", "sendkit", "config.json");
+const cliCongigSchema = z.object({
+  telegramBotToken: z.string().min(1, "botToken is required"),
+});
+
+function writeTelegramBotToken(token: string) {
+  mkdirSync(dirname(configPath), { recursive: true });
+  writeFileSync(
+    configPath,
+    `${JSON.stringify({ telegramBotToken: token }, null, 2)}\n`,
+    {
+      mode: 0o600,
+    },
+  );
+}
+
+function getTelegramBotToken() {
+  if (!existsSync(configPath)) {
+    throw new Error(
+      "telegram bot token is not set. run `sendkit init` to set it",
+    );
+  }
+
+  const config = cliCongigSchema.parse(
+    JSON.parse(readFileSync(configPath, "utf-8")),
+  );
+
+  const token = config.telegramBotToken;
+  if (!token) {
+    throw new Error(
+      "telegram bot token is not set. run `sendkit init` to set it",
+    );
+  }
+  return token;
+}
+
+program.name("sendkit").description("sendkit CLI backed by sendkit-core");
 
 program
-  .name("sendkit")
-  .description("sendkit cli tutorial")
+  .command("init")
+  .description("Initialize sendkit cli settings")
+  .requiredOption("--telegram-bot-token <botToken>", "Telegram bot token")
+  .action(async (options: { telegramBotToken: string }) => {
+    writeTelegramBotToken(options.telegramBotToken);
+    console.log(`Saved SendKit CLI config to ${configPath}`);
+  });
+
+program
   .command("telegram")
   .description("Send a telegram message")
   .argument("<chatId>", "Telegram Id")
   .argument("<message>", "Message text to send")
   .action(async (chatId: string, message: string) => {
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    if (!token) {
-      console.error("TELEGRAM_BOT_TOKEN is not set");
-      process.exit(1);
-    }
+    
 
-    if (!chatId) {
-      console.error("chatId is not set");
-      process.exit(1);
-    }
+    const result = await sendTelegramMessage({
+      chatId,
+      message,
+      botToken: getTelegramBotToken(),
+    });
 
-    if (!message) {
-      console.error("message is not set");
-      process.exit(1);
-    }
-
-    try {
-      const result = await sendTelegramMessage({
-        chatId,
-        message,
-        botToken: token,
-      });
-      console.log(`Sent Telegram message to chat ${result.chatId}`);
-      console.log(`Telegram messageId ${result.messageId}`);
-    } catch (error) {
-      const detail = error instanceof Error ? error.message : String(error);
-      console.error(`Telegram API error: ${detail}`);
-      process.exit(1);
-    }
+    console.log(JSON.stringify(result));
   });
 
-program.parseAsync(process.argv);
+await program.parseAsync(process.argv).catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});
 
 // https://api.telegram.org/bot<token>/getUpdates
 
