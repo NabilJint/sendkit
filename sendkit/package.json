@@ -1,5 +1,5 @@
 {
-  "name": "sendkit-workspace",
+  "name": "@jint_2./sendkit-workspace",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -11,6 +11,9 @@
     "format:check": "oxfmt . --check",
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix",
+    "build:core": "bun run --filter @jint_2./sendkit-core build",
+    "build:cli": "bun run --filter @jint_2./sendkit build",
+    "build:local-mcp": "bun run --filter @jint_2./sendkit-local-mcp build",
     "dev:cli": "bun run packages/cli/src/index.ts",
     "dev:local-mcp": "bun run packages/local-mcp/src/index.ts",
     "dev:remote-mcp": "bun run apps/remote-mcp/src/index.ts",

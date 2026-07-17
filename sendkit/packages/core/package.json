@@ -1,11 +1,14 @@
 {
-  "name": "sendkit-core",
+  "name": "@jint_2./sendkit-core",
   "version": "0.0.0",
   "private": "true",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown"
   },
   "dependencies": {
     "zod": "^4.4.3"
