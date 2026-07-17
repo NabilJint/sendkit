@@ -6,9 +6,6 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "devDependencies": {
-    "@types/node": "^26.1.1"
-  },
   "dependencies": {
     "@clerk/backend": "^3.11.7",
     "@clerk/mcp-tools": "^0.6.0",

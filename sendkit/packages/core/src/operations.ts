@@ -4,7 +4,6 @@ import {
   telegramSendMessageRequestSchema,
   telegramSendMessageResponseSchema,
   type TelegramMessageOption,
-  type TelegramMessageInput,
   telegramMessageOuput,
 } from "./schema";
 
@@ -16,17 +15,14 @@ export async function sendTelegramMessage(
     chat_id: parsedInput.chatId,
     text: parsedInput.message,
   });
-  const response = await fetch(
-    `https://api.telegram.org/bot${parsedInput.botToken}/sendMessage`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: await Response.json(requestBody).text(),
-      // body: JSON.stringify(requestBody),
+  const response = await fetch(`https://api.telegram.org/bot${parsedInput.botToken}/sendMessage`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: await Response.json(requestBody).text(),
+    // body: JSON.stringify(requestBody),
+  });
 
   const data = telegramSendMessageResponseSchema.parse(await response.json());
   if (!response.ok || !data.ok || !data.result) {

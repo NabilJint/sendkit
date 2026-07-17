@@ -13,31 +13,21 @@ const cliCongigSchema = z.object({
 
 function writeTelegramBotToken(token: string) {
   mkdirSync(dirname(configPath), { recursive: true });
-  writeFileSync(
-    configPath,
-    `${JSON.stringify({ telegramBotToken: token }, null, 2)}\n`,
-    {
-      mode: 0o600,
-    },
-  );
+  writeFileSync(configPath, `${JSON.stringify({ telegramBotToken: token }, null, 2)}\n`, {
+    mode: 0o600,
+  });
 }
 
 function getTelegramBotToken() {
   if (!existsSync(configPath)) {
-    throw new Error(
-      "telegram bot token is not set. run `sendkit init` to set it",
-    );
+    throw new Error("telegram bot token is not set. run `sendkit init` to set it");
   }
 
-  const config = cliCongigSchema.parse(
-    JSON.parse(readFileSync(configPath, "utf-8")),
-  );
+  const config = cliCongigSchema.parse(JSON.parse(readFileSync(configPath, "utf-8")));
 
   const token = config.telegramBotToken;
   if (!token) {
-    throw new Error(
-      "telegram bot token is not set. run `sendkit init` to set it",
-    );
+    throw new Error("telegram bot token is not set. run `sendkit init` to set it");
   }
   return token;
 }
@@ -59,8 +49,6 @@ program
   .argument("<chatId>", "Telegram Id")
   .argument("<message>", "Message text to send")
   .action(async (chatId: string, message: string) => {
-    
-
     const result = await sendTelegramMessage({
       chatId,
       message,

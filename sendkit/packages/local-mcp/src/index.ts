@@ -10,9 +10,7 @@ const server = new McpServer({
 function getTelegramBotToken() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
-    console.error(
-      "TELEGRAM_BOT_TOKEN is not set. configure it in your MCP client environment",
-    );
+    console.error("TELEGRAM_BOT_TOKEN is not set. configure it in your MCP client environment");
     process.exit(1);
   }
   return token;

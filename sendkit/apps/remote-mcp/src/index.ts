@@ -57,14 +57,8 @@ function createServer(botToken: string) {
 const app = new Hono();
 
 // this function is used to generate the URL for the protected resource metadata
-function generateClerkProtectedResourceMetadataUrl(
-  c: Context,
-  botToken: string,
-) {
-  return new URL(
-    `/.well-known/oauth-protected-resourse/${botToken}/mcp`,
-    c.req.url,
-  ).toString();
+function generateClerkProtectedResourceMetadataUrl(c: Context, botToken: string) {
+  return new URL(`/.well-known/oauth-protected-resourse/${botToken}/mcp`, c.req.url).toString();
 }
 
 function unauthorizedMcpResponse(c: Context, botToken: string) {
@@ -79,10 +73,7 @@ app.get("/.well-known/oauth-protected-resource/:botToken/mcp", (c) => {
   return c.json(
     generateClerkProtectedResourceMetadata({
       publishableKey: clerkPublicKey,
-      resourceUrl: new URL(
-        `/${c.req.param("botToken")}/mcp`,
-        c.req.url,
-      ).toString(),
+      resourceUrl: new URL(`/${c.req.param("botToken")}/mcp`, c.req.url).toString(),
     }),
   );
 });
@@ -99,13 +90,13 @@ app.post("/:botToken/mcp", async (c) => {
     const requestState = await clerkClient.authenticateRequest(c.req.raw, {
       acceptsToken: "oauth_token",
     });
-      
-      if (!requestState.isAuthenticated) {
-        return unauthorizedMcpResponse(c, botToken);
-      }
-      
-  } catch (error) {
+
+    if (!requestState.isAuthenticated) {
       return unauthorizedMcpResponse(c, botToken);
+    }
+  } catch (error) {
+    console.log(error);
+    return unauthorizedMcpResponse(c, botToken);
   }
 
   const server = createServer(botToken);
