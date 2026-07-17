@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -13,7 +14,9 @@ const server = new McpServer({
 function getTelegramBotToken() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
-    console.error("TELEGRAM_BOT_TOKEN is not set. configure it in your MCP client environment");
+    console.error(
+      "TELEGRAM_BOT_TOKEN is not set. configure it in your MCP client environment",
+    );
     process.exit(1);
   }
   return token;
